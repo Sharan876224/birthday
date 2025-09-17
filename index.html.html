@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday!</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Fixed Heart animation CSS */
+        .heart {
+            position: absolute;
+            bottom: -150px;
+            width: 90px;
+            height: 90px;
+            animation: floatUp 15s ease-in-out infinite;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            background-color: var(--heart-color);
+            transform: rotate(45deg);
+            border-radius: 50% 50% 0 0;
+            z-index: 10;
+        }
+        
+        .heart::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: var(--heart-color);
+            border-radius: 50%;
+            left: -50%;
+            top: 0;
+        }
+
+        .heart::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: var(--heart-color);
+            border-radius: 50%;
+            left: 0;
+            top: -50%;
+        }
+
+        .balloon {
+            position: absolute;
+            bottom: -150px;
+            width: 80px;
+            height: 100px;
+            animation: floatUp 15s ease-in-out infinite;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .balloon::before {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 75px;
+            background: var(--balloon-color);
+            border-radius: 50%;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .balloon::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 50px;
+            background: #fff;
+            top: 75px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .page {
+            display: none;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .page.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* Scratch Card styles */
+        #scratch-container {
+            position: relative;
+            width: 300px;
+            height: 150px;
+            cursor: pointer;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        #scratch-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" style="font-size: 24px;"><text x="0" y="24">🎁</text></svg>'), auto;
+        }
+        #scratch-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #4b5563;
+            font-size: 1.5rem;
+            font-weight: bold;
+            pointer-events: none;
+        }
+
+        /* Photo Grid Animation Styles */
+        @keyframes fade-and-rotate {
+            0% { opacity: 0; transform: translateY(20px) rotate(-5deg) scale(0.95); }
+            100% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+        }
+
+        .photo-card-grid {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fade-and-rotate 1s ease-out forwards;
+            transition: transform 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .photo-card-grid:hover {
+            transform: scale(1.05);
+        }
+
+        .photo-card-grid img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pink-300 via-purple-300 to-indigo-400 min-h-screen font-sans text-gray-800 flex items-center justify-center overflow-hidden">
+
+    <!-- Background Music Player -->
+    <!-- Add your song URL here for the background music to play -->
+    <audio id="background-song" autoplay loop hidden>
+        <source src="https://soundcloud.com/user-79781816/ed-sheeran-perfect-official-audio?si=6e6ff90684b847fbb8ad348dd58de58b&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing" type="audio/mpeg">
+    </audio>
+
+    <!-- Page 1: Surprise Page with Scratch-off -->
+    <div id="page1" class="page active flex-col justify-center items-center text-center p-8 w-full max-w-4xl mx-auto min-h-screen">
+        <h1 class="text-6xl md:text-8xl font-bold text-white drop-shadow-lg animate-pulse">
+            A Little Surprise!
+        </h1>
+        <div class="mt-8">
+            <div id="scratch-container" class="relative bg-gray-200 rounded-xl overflow-hidden p-4 mx-auto w-full max-w-sm">
+                <canvas id="scratch-canvas" class="rounded-xl"></canvas>
+                <div id="scratch-message" class="text-xl md:text-2xl font-semibold">
+                    Scratch to unwrap!
+                </div>
+                <button id="nextPage1Btn" class="absolute bottom-4 left-1/2 -translate-x-1/2 px-8 py-4 bg-white text-pink-500 font-bold rounded-full shadow-lg hover:bg-gray-100 transform transition-transform hover:scale-105 active:scale-95 opacity-0 pointer-events-none">
+                    Click to Begin
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 2: Birthday Wishes -->
+    <div id="page2" class="page flex-col justify-center items-center p-8 w-full max-w-4xl mx-auto min-h-screen text-center">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl transform scale-95 opacity-0 transition-all duration-700 ease-out" id="message-box">
+            <h2 class="text-4xl md:text-5xl font-bold text-purple-600 mb-6 drop-shadow-md">
+                My Birthday Wishes for You
+            </h2>
+            <p class="text-xl md:text-2xl text-gray-700 leading-relaxed fade-in" style="animation-delay: 0.3s;">
+                Dearest June!,<br>
+                Wishing you the happiest of birthdays! You're an incredible friend, and I'm so grateful for every moment we've shared. May your year be filled with as much joy as you bring to others.
+            </p>
+            <div class="mt-8 text-4xl md:text-5xl font-bold text-pink-500 animate-bounce fade-in" style="animation-delay: 0.6s;">
+                Happy Birthday!
+            </div>
+        </div>
+        <button id="nextPage2Btn" class="mt-10 px-8 py-4 bg-white text-purple-500 font-bold rounded-full shadow-lg hover:bg-gray-100 transform transition-transform hover:scale-105 active:scale-95 fade-in" style="animation-delay: 1.2s;">
+            See the photos
+        </button>
+    </div>
+
+    <!-- Page 3: Main Photo Gallery -->
+    <div id="page3" class="page flex-col justify-center items-center p-8 w-full max-w-6xl mx-auto min-h-screen">
+        <h2 class="text-4xl md:text-5xl font-bold text-white drop-shadow-lg text-center fade-in">
+            Her Photos
+        </h2>
+        <div class="grid grid-cols-2 gap-6 mt-10 w-full">
+            <!-- These are the 4 main photo grids that link to albums -->
+            <div id="photo-album1" class="photo-card-grid bg-white p-4 rounded-xl shadow-xl" style="animation-delay: 0.3s;">
+                <img src="https://placehold.co/600x400/b6d6f2/ffffff?text=Friendship" alt="Friendship Album">
+            </div>
+            <div id="photo-album2" class="photo-card-grid bg-white p-4 rounded-xl shadow-xl" style="animation-delay: 0.6s;">
+                <img src="https://placehold.co/600x400/98c1d9/ffffff?text=YOU" alt="You Album">
+            </div>
+            <div id="photo-album3" class="photo-card-grid bg-white p-4 rounded-xl shadow-xl" style="animation-delay: 0.9s;">
+                <img src="https://placehold.co/600x400/4c758f/ffffff?text=MEMORIES" alt="MEMORIES Album">
+            </div>
+            <div id="photo-album4" class="photo-card-grid bg-white p-4 rounded-xl shadow-xl" style="animation-delay: 1.2s;">
+                <img src="https://placehold.co/600x400/808080/ffffff?text=Us" alt="Us Album">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Album Pages -->
+    <!-- Album Page 1 -->
+    <div id="album1" class="page flex-col justify-start items-center p-8 w-full min-h-screen pt-16">
+        <button id="backToGallery1" class="fixed top-8 left-8 px-6 py-2 bg-white text-gray-800 rounded-full shadow-lg hover:bg-gray-100 z-10 transition-transform hover:scale-105">
+            ← Back
+        </button>
+        <h2 class="text-4xl md:text-5xl font-bold text-white drop-shadow-lg text-center mb-10">
+            Friendship Album
+        </h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 w-full max-w-6xl">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-16 at 22.41.27_1262c1dc.jpg" alt="Friendship Photo 1">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-16 at 22.41.31_7282eafb.jpg" alt="Friendship Photo 2">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-16 at 22.41.32_86a99f48.jpg" alt="Friendship Photo 3">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-16 at 22.41.37_5283ced7.jpg" alt="Friendship Photo 4">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-16 at 22.41.47_2d7604cd.jpg" alt="Friendship Photo 5">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-16 at 22.41.51_9a109e6b.jpg" alt="Friendship Photo 6">
+        </div>
+    </div>
+
+    <!-- Album Page 2 -->
+    <div id="album2" class="page flex-col justify-start items-center p-8 w-full min-h-screen pt-16">
+        <button id="backToGallery2" class="fixed top-8 left-8 px-6 py-2 bg-white text-gray-800 rounded-full shadow-lg hover:bg-gray-100 z-10 transition-transform hover:scale-105">
+            ← Back
+        </button>
+        <h2 class="text-4xl md:text-5xl font-bold text-white drop-shadow-lg text-center mb-10">
+            YOU Album
+        </h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 w-full max-w-6xl">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-03-13 at 16.39.10_e943d858.jpg" alt="Laughter Photo 1">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-14 at 17.12.34_bf79506b.jpg" alt="Laughter Photo 2">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-14 at 13.42.18_3655f76a.jpg" alt="Laughter Photo 3">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-14 at 13.42.18_ee34bbbf.jpg" alt="Laughter Photo 4">
+             <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-14 at 13.42.19_c099e734.jpg" alt="Laughter Photo 4">
+             <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-16 at 22.41.30_0a2bf8b2.jpg" alt="Laughter Photo 4">
+        </div>
+    </div>
+
+    <!-- Album Page 3 -->
+    <div id="album3" class="page flex-col justify-start items-center p-8 w-full min-h-screen pt-16">
+        <button id="backToGallery3" class="fixed top-8 left-8 px-6 py-2 bg-white text-gray-800 rounded-full shadow-lg hover:bg-gray-100 z-10 transition-transform hover:scale-105">
+            ← Back
+        </button>
+        <h2 class="text-4xl md:text-5xl font-bold text-white drop-shadow-lg text-center mb-10">
+            MEMORIES Album
+        </h2>
+        <video controls autoplay>
+  <source src="image/WhatsApp Video 2025-09-16 at 22.41.51_c88fb7a6.mp4" type="video/mp4">
+  </video>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-6 w-full max-w-6xl">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-16 at 22.41.46_6036375a.jpg" alt="Best Friends Photo 2">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-16 at 22.41.33_98b21771.jpg" alt="Best Friends Photo 3">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-16 at 22.41.47_2d7604cd.jpg" alt="Best Friends Photo 3">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-16 at 22.41.51_4e649863.jpg" alt="Best Friends Photo 3">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-16 at 22.41.47_8ea6996d.jpg" alt="Best Friends Photo 3">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-16 at 22.41.52_477e25c0.jpg" alt="Best Friends Photo 3">
+
+        </div>
+    </div>
+
+    <!-- Album Page 4: "Us" page with special message -->
+    <div id="album4" class="page flex-col justify-start items-center p-8 w-full min-h-screen pt-16">
+        <button id="backToGallery4" class="fixed top-8 left-8 px-6 py-2 bg-white text-gray-800 rounded-full shadow-lg hover:bg-gray-100 z-10 transition-transform hover:scale-105">
+            ← Back
+        </button>
+        <h2 class="text-4xl md:text-5xl font-bold text-white drop-shadow-lg text-center mb-10">
+            Our Moments
+        </h2>
+        <div class="flex flex-col items-center justify-center p-8 bg-white/20 backdrop-blur-md rounded-2xl shadow-xl text-center w-full max-w-md animate-pulse">
+            <p class="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
+                When should we fill this? 🤔
+            </p>
+             <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/WhatsApp Image 2025-09-17 at 20.22.24_383af4a4.jpg" alt="Best Friends Photo 3">
+            <img class="rounded-xl shadow-xl transform transition-transform hover:scale-105" src="image/IMG_20250612_083120.jpg" alt="Best Friends Photo 3">
+
+        </div>
+    </div>
+    
+    <!-- Hearts Container -->
+    <div id="hearts-container" class="absolute inset-0 z-0 pointer-events-none"></div>
+
+    <!-- Balloons Container -->
+    <div id="balloons-container" class="absolute inset-0 z-0 pointer-events-none"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const pages = document.querySelectorAll('.page');
+            const page1Btn = document.getElementById('nextPage1Btn');
+            const page2Btn = document.getElementById('nextPage2Btn');
+            const messageBox = document.getElementById('message-box');
+            let currentPageId = 'page1';
+            let heartInterval = null;
+            let balloonInterval = null;
+
+            function showPage(pageId) {
+                // Ensure overflow-hidden is only active on the intro page.
+                document.body.classList.toggle('overflow-hidden', pageId === 'page1');
+                
+                pages.forEach(page => {
+                    page.classList.remove('active');
+                    if (page.id === pageId) {
+                        page.classList.add('active');
+                    }
+                });
+
+                // Start or stop animations based on the current page
+                if (pageId === 'album4') {
+                    startHeartAnimation();
+                } else {
+                    startBalloonAnimation();
+                }
+            }
+            
+            // Animation logic
+            const heartsContainer = document.getElementById('hearts-container');
+            const balloonsContainer = document.getElementById('balloons-container');
+
+            function createHeart() {
+                const colors = ['#ff6347', '#ffb6c1', '#a5b4fc', '#9370db', '#90ee90'];
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                heart.style.setProperty('--heart-color', randomColor);
+                heart.style.left = `${Math.random() * 100}vw`;
+                heart.style.animationDuration = `${10 + Math.random() * 10}s`;
+                heart.style.animationDelay = `${Math.random() * 5}s`;
+                heartsContainer.appendChild(heart);
+                
+                setTimeout(() => {
+                    heart.remove();
+                }, 20000);
+            }
+
+            function createBalloon() {
+                const colors = ['linear-gradient(#ff6b6b, #ffa3a3)', 'linear-gradient(#ffdd57, #ffef8b)', 'linear-gradient(#56c7d1, #84e0e8)', 'linear-gradient(#90ee90, #c4f3c4)'];
+                const balloon = document.createElement('div');
+                balloon.className = 'balloon';
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                balloon.style.setProperty('--balloon-color', randomColor);
+                balloon.style.left = `${Math.random() * 100}vw`;
+                balloon.style.animationDuration = `${10 + Math.random() * 10}s`;
+                balloon.style.animationDelay = `${Math.random() * 5}s`;
+                balloonsContainer.appendChild(balloon);
+
+                setTimeout(() => {
+                    balloon.remove();
+                }, 20000);
+            }
+
+            function startHeartAnimation() {
+                if (balloonInterval) { clearInterval(balloonInterval); balloonInterval = null; }
+                if (!heartInterval) {
+                    heartInterval = setInterval(createHeart, 1500);
+                }
+            }
+
+            function startBalloonAnimation() {
+                if (heartInterval) { clearInterval(heartInterval); heartInterval = null; }
+                if (!balloonInterval) {
+                    balloonInterval = setInterval(createBalloon, 1500);
+                }
+            }
+
+            // Scratch card logic
+            const scratchContainer = document.getElementById('scratch-container');
+            const canvas = document.getElementById('scratch-canvas');
+            const ctx = canvas.getContext('2d');
+            const scratchMessage = document.getElementById('scratch-message');
+            let isScratching = false;
+
+            function initScratchCard() {
+                const rect = scratchContainer.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+
+                // Draw the scratchable layer
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, '#a5b4fc'); // Indigo-200
+                gradient.addColorStop(1, '#6366f1'); // Indigo-500
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            function getScratchedPercentage() {
+                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const pixels = imgData.data;
+                let clearedPixels = 0;
+                for (let i = 0; i < pixels.length; i += 4) {
+                    if (pixels[i] === 0 && pixels[i+1] === 0 && pixels[i+2] === 0 && pixels[i+3] === 0) {
+                        clearedPixels++;
+                    }
+                }
+                return (clearedPixels / (canvas.width * canvas.height)) * 100;
+            }
+            
+            function showNextButton() {
+                page1Btn.classList.remove('opacity-0', 'pointer-events-none');
+                page1Btn.classList.add('opacity-100', 'pointer-events-auto');
+            }
+
+            function scratch(x, y) {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.arc(x, y, 20, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                if (getScratchedPercentage() > 70) {
+                    showNextButton();
+                    scratchContainer.removeEventListener('mousedown', startScratch);
+                    scratchContainer.removeEventListener('mousemove', scratchMove);
+                    document.removeEventListener('mouseup', endScratch);
+                    scratchContainer.removeEventListener('touchstart', startScratchTouch);
+                    scratchContainer.removeEventListener('touchmove', scratchMoveTouch);
+                    document.removeEventListener('touchend', endScratchTouch);
+                    scratchMessage.style.display = 'none';
+                }
+            }
+
+            function startScratch(e) {
+                isScratching = true;
+                scratch(e.offsetX, e.offsetY);
+            }
+            function scratchMove(e) {
+                if (!isScratching) return;
+                scratch(e.offsetX, e.offsetY);
+            }
+            function endScratch() {
+                isScratching = false;
+            }
+
+            function startScratchTouch(e) {
+                e.preventDefault();
+                isScratching = true;
+                const rect = canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                scratch(touch.clientX - rect.left, touch.clientY - rect.top);
+            }
+            function scratchMoveTouch(e) {
+                e.preventDefault();
+                if (!isScratching) return;
+                const rect = canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                scratch(touch.clientX - rect.left, touch.clientY - rect.top);
+            }
+            function endScratchTouch() {
+                isScratching = false;
+            }
+            
+            // Add event listeners for mouse and touch
+            scratchContainer.addEventListener('mousedown', startScratch);
+            scratchContainer.addEventListener('mousemove', scratchMove);
+            document.addEventListener('mouseup', endScratch);
+            scratchContainer.addEventListener('touchstart', startScratchTouch);
+            scratchContainer.addEventListener('touchmove', scratchMoveTouch);
+            document.addEventListener('touchend', endScratchTouch);
+
+            // Simple navigation
+            page1Btn.addEventListener('click', () => {
+                currentPageId = 'page2';
+                showPage(currentPageId);
+                // Trigger the message box animation
+                setTimeout(() => {
+                    messageBox.classList.remove('scale-95', 'opacity-0');
+                    messageBox.classList.add('scale-100', 'opacity-100');
+                }, 100);
+            });
+
+            page2Btn.addEventListener('click', () => {
+                currentPageId = 'page3';
+                showPage(currentPageId);
+            });
+            
+            // Photo Album Navigation
+            document.getElementById('photo-album1').addEventListener('click', () => {
+                showPage('album1');
+            });
+            document.getElementById('photo-album2').addEventListener('click', () => {
+                showPage('album2');
+            });
+            document.getElementById('photo-album3').addEventListener('click', () => {
+                showPage('album3');
+            });
+            document.getElementById('photo-album4').addEventListener('click', () => {
+                showPage('album4');
+            });
+
+            // Back buttons for albums
+            document.getElementById('backToGallery1').addEventListener('click', () => {
+                showPage('page3');
+            });
+            document.getElementById('backToGallery2').addEventListener('click', () => {
+                showPage('page3');
+            });
+            document.getElementById('backToGallery3').addEventListener('click', () => {
+                showPage('page3');
+            });
+            document.getElementById('backToGallery4').addEventListener('click', () => {
+                showPage('page3');
+            });
+
+            // Initial setup
+            showPage(currentPageId);
+            initScratchCard();
+        });
+    </script>
+</body>
+</html>
